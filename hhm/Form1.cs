@@ -17,45 +17,101 @@ namespace hhm {
         }
 
         private void button1_Click( object sender, EventArgs e ) {
-            HHM h = HHM.readFromFile( "hhm.txt" );
-            viterbi vi = new viterbi( h );
-            vi.setOmega( "TGAGTATCACTTAGGTCTATGTCTAGTCGTCTTTCGTAATGTTTGGTCTTGTCACCAGTTATCCTATGGCGCTCCGAGTCTGGTTCTCGAAATAAGCATCCCCGCCCAAGTCATGCACCCGTTTGTGTTCTTCGCCGACTTGAGCGACTTAATGAGGATGCCACTCGTCACCATCTTGAACATGCCACCAACGAGGTTGCCGCCGTCCATTATAACTACAACCTAGACAATTTTCGCTTTAGGTCCATTCACTAGGCCGAAATCCGCTGGAGTAAGCACAAAGCTCGTATAGGCAAAACCGACTCCATGAGTCTGCCTCCCGACCATTCCCATCAAAATACGCTATCAATACTAAAAAAATGACGGTTCAGCCTCACCCGGATGCTCGAGACAGCACACGGACATGATAGCGAACGTGACCAGTGTAGTGGCCCAGGGGAACCGCCGCGCCATTTTGTTCATGGCCCCGCTGCCGAATATTTCGATCCCAGCTAGAGTAATGACCTGTAGCTTAAACCCACTTTTGGCCCAAACTAGAGCAACAATCGGAATGGCTGAAGTGAATGCCGGCATGCCCTCAGCTCTAAGCGCCTCGATCGCAGTAATGACCGTCTTAACATTAGCTCTCAACGCTATGCAGTGGCTTTGGTGTCGCTTACTACCAGTTCCGAACGTCTCGGGGGTCTTGATGCAGCGCACCACGATGCCAAGCCACGCTGAATCGGGCAGCCAGCAGGATCGTTACAGTCGAGCCCACGGCAATGCGAGCCGTCACGTTGCCGAATATGCACTGCGGGACTACGGACGCAGGGCCGCCAACCATCTGGTTGACGATAGCCAAACACGGTCCAGAGGTGCCCCATCTCGGTTATTTGGATCGTAATTTTTGTGAAGAACACTGCAAACGCAAGTGGCTTTCCAGACTTTACGACTATGTGCCATCATTTAAGGCTACGACCCGGCTTTTAAGACCCCCACCACTAAATAGAGGTACATCTGA" );
-            var omega = vi.getOmega();
-            testOmegas( omega );
-            String res = vi.backtrack();
+            try {
+                HHM h = HHM.readFromFile( textBox1.Text );
+                viterbi vi = new viterbi( h );
 
-            if (res.Equals( "4444432132132132132132132132132132132132132132132132132132132132132132144444444445675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675674321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321321432132132132132132132132144445675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675675674444444567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567567443213213213213213213213213213213213213213213213213213213213213213213213213213213213213213213213214321321321321321321321321321321321321321321321321321321321321321" )) {
-                MessageBox.Show( "IT WORKS" );
-            } else {
-                MessageBox.Show( "nope,doesnt work.... yet" );
+                var fa = FA.readFromFile( textBox4.Text );
+
+                if (textBox3.Text.Length > 0) {
+                    vi.setOmega( textBox3.Text );
+                } else {
+                    vi.setOmega( fa.data );
+                }
+                var omega = vi.getOmegaMulti();
+                // testOmegas( omega );
+                String res = vi.backtrack();
+
+
+
+                File.WriteAllText( textBox2.Text, fa.description + "\r\n" + res );
+                MessageBox.Show( "sucess" );
+            } catch (Exception except) {
+                MessageBox.Show( "Error:" + except.Message );
             }
         }
 
-        private void testOmegas( List<List<double>> omega ) {
+        //private void testOmegas( List<List<double>> omega ) {
 
-            string file = "omega.txt";
+        //    string file = "omega.txt";
 
 
 
-            var lines = File.ReadAllLines( file );
-            var readOmgea = new double[1000, 7];
-            for (int i = 0; i < 1000; i++) {
-                var split = lines[i].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
-                int j = 0;
-                foreach (var item in split) {
-                    readOmgea[i, j] = double.Parse( item, CultureInfo.InvariantCulture );
-                    j++;
-                }
-            }
-            for (int i = 0; i < 1000; i++) {
-                for (int j = 0; j < 7; j++) {
-                    if (omega[i][j] - readOmgea[i, j] > 0.01d) {
-                        MessageBox.Show( "ERROR IN OMEGA" );
-                    }
-                }
-            }
+        //    var lines = File.ReadAllLines( file );
+        //    var readOmgea = new double[1000, 7];
+        //    for (int i = 0; i < 1000; i++) {
+        //        var split = lines[i].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
+        //        int j = 0;
+        //        foreach (var item in split) {
+        //            readOmgea[i, j] = double.Parse( item, CultureInfo.InvariantCulture );
+        //            j++;
+        //        }
+        //    }
+        //    for (int i = 0; i < 1000; i++) {
+        //        for (int j = 0; j < 7; j++) {
+        //            if (omega[i][j] - readOmgea[i, j] > 0.01d) {
+        //                MessageBox.Show( "ERROR IN OMEGA" );
+        //            }
+        //        }
+        //    }
+
+        //}
+
+        private void textBox1_TextChanged( object sender, EventArgs e ) {
 
         }
 
+        private void label1_Click( object sender, EventArgs e ) {
+
+        }
+
+        private void button2_Click( object sender, EventArgs e ) {
+            var res = openFileDialog1.ShowDialog();
+            if (res == DialogResult.OK) {
+                textBox1.Text = openFileDialog1.FileName;
+            }
+        }
+
+        private void button3_Click( object sender, EventArgs e ) {
+            var res = saveFileDialog1.ShowDialog();
+            if (res == DialogResult.OK) {
+                textBox2.Text = saveFileDialog1.FileName;
+            }
+        }
+
+        private void button4_Click( object sender, EventArgs e ) {
+            var res = openFileDialog2.ShowDialog();
+            if (res == DialogResult.OK) {
+                textBox4.Text = openFileDialog2.FileName;
+            }
+        }
+
+        private void button5_Click( object sender, EventArgs e ) {
+            if (File.Exists(textBox2.Text)) {
+                System.Diagnostics.Process.Start( textBox2.Text );
+            }
+        }
+
+        private void button6_Click( object sender, EventArgs e ) {
+            //TODO make me.
+        }
+
+        private void openFileDialog2_FileOk( object sender, CancelEventArgs e ) {
+
+        }
+
+        private void saveFileDialog1_FileOk( object sender, CancelEventArgs e ) {
+
+        }
     }
 }

@@ -44,7 +44,7 @@ namespace hhm {
             var initpr = new List<double>();
             split = lines[7].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
             for (int i = 0; i < states; i++) {
-                initpr.Add( double.Parse( split[i], CultureInfo.InvariantCulture  ) );
+                initpr.Add( double.Parse( split[i], CultureInfo.InvariantCulture ) );
             }
 
 
