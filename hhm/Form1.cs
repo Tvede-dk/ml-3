@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Windows.Forms;
 
 namespace hhm {
@@ -97,7 +91,7 @@ namespace hhm {
         }
 
         private void button5_Click( object sender, EventArgs e ) {
-            if (File.Exists(textBox2.Text)) {
+            if (File.Exists( textBox2.Text )) {
                 System.Diagnostics.Process.Start( textBox2.Text );
             }
         }
