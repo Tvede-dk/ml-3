@@ -6,10 +6,10 @@ In this project we are going to predict the gene structure of the 5 annotated ge
 * Tune model parameters by training, i.e. set the non-fixed emission and transition probabilities.
 * Use your best model to predict the gene structure for the 5 unannotated genomes using the Viterbi algorithm with subsequent backtracking. I.e. for each unannotated genome you must find the most likely sequence of states in your model generating it, and convert this sequence of states into a FASTA file giving the annotation of each nucleotide as N, C, or R. You should make files, annotation6.fa, ..., annotation10.fa, giving the annotation for the 5 unannotated genomes. 
  
-Run on Linux
+Build and execute on Linux
 ----------------
 
 1. Ensure that you have [mono installed](http://www.mono-project.com/download/#download-lin)
 2. Run `xbuild` in root directory
-3. Change into `hhm/bin/[Debug]/`
+3. Change into directory `hhm/bin/[Debug]/`
 4. Run `mono hhm.exe`
