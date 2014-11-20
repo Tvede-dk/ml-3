@@ -234,7 +234,7 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
+		private System.Windows.Forms.Button button6;
     }
 }
 
