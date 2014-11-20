@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
-
 using System.Windows.Forms;
 
 namespace hhm {
@@ -17,24 +18,8 @@ namespace hhm {
 
 		private void button1_Click( object sender , EventArgs e ) {
 			try {
-				HHM h = HHM.readFromFile(textBox1.Text);
-				viterbi vi = new viterbi(h);
-
-				var fa = new FA();
-
-				if ( textBox3.Text.Length > 0 ) {
-					fa.description = ">DIRECT INPUT";
-					fa.data = textBox3.Text.Trim().Replace("\r" , "").Replace("\n" , "");
-				} else {
-					fa = FA.readFromFile(textBox4.Text);
-				}
-				vi.setOmega(fa.data);
-				var omega = vi.getOmegaMulti();
-				// testOmegas( omega );
-				String res = vi.backtrack();
-
-
-
+				var fa = getFaFromForm();
+				VitterbiResult res = getViterbiPrediction(fa);
 				File.WriteAllText(textBox2.Text , fa.description + "\r\n" + res);
 				MessageBox.Show("sucess");
 			} catch ( Exception except ) {
@@ -42,31 +27,55 @@ namespace hhm {
 			}
 		}
 
-		//private void testOmegas( List<List<double>> omega ) {
+		private FA getFaFromForm() {
+			var fa = new FA();
+			if ( textBox3.Text.Length > 0 ) {
+				fa.description = ">DIRECT INPUT";
+				fa.data = getOmegaFromBox();
+			} else {
+				fa = FA.readFromFile(textBox4.Text);
+			}
+			return fa;
+		}
 
-		//    string file = "omega.txt";
+		private VitterbiResult getViterbiPrediction( FA f ) {
+			viterbi vi = getVitterbiDefualt();
+			vi.setOmega(f.data);
+			List<List<double>> omega = vi.getOmegaMulti();
+			return new VitterbiResult { prediction = vi.backtrack() , omega = omega };
+		}
+
+		private viterbi getVitterbiDefualt() {
+			HHM h = HHM.readFromFile(textBox1.Text);
+			viterbi vi = new viterbi(h);
+			return vi;
+		}
 
 
 
-		//    var lines = File.ReadAllLines( file );
-		//    var readOmgea = new double[1000, 7];
-		//    for (int i = 0; i < 1000; i++) {
-		//        var split = lines[i].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
-		//        int j = 0;
-		//        foreach (var item in split) {
-		//            readOmgea[i, j] = double.Parse( item, CultureInfo.InvariantCulture );
-		//            j++;
-		//        }
-		//    }
-		//    for (int i = 0; i < 1000; i++) {
-		//        for (int j = 0; j < 7; j++) {
-		//            if (omega[i][j] - readOmgea[i, j] > 0.01d) {
-		//                MessageBox.Show( "ERROR IN OMEGA" );
-		//            }
-		//        }
-		//    }
-
-		//}
+		private indexInOmega testOmegas( List<List<double>> omega, string toCompareWith ) {
+		    var lines = toCompareWith.Split('\r');
+			if ( lines.Length == 1 ) {
+				lines = lines[0].Split('\n');
+			}
+			var newOmega = new double[omega.Count,omega[0].Count ];
+		    for (int i = 0; i < lines.Length; i++) {
+		        var split = lines[i].Replace("\n", "").Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
+		        int j = 0;
+		        foreach (var item in split) {
+		            newOmega[i,j] = double.Parse( item, CultureInfo.InvariantCulture );
+		            j++;
+		        }
+		    }
+			for ( int i = 0 ; i < omega.Count ; i++ ) {
+				for ( int j = 0 ; j < omega[0].Count ; j++ ) {
+		            if (omega[i][j] - newOmega[i, j] > 0.01d) {
+						return new indexInOmega(){ firstIndex = i ,secoundIndex = j };
+		            }
+		        }
+		    }
+			return null;
+		}
 
 		private void textBox1_TextChanged( object sender , EventArgs e ) {
 
@@ -95,9 +104,9 @@ namespace hhm {
 			if ( res == DialogResult.OK ) {
 				textBox4.Text = openFileDialog2.FileName;
 				if ( textBox2.Text.Length > 0 ) {
-					string end =  Path.GetFileName(openFileDialog2.FileName);
+					string end = Path.GetFileName(openFileDialog2.FileName);
 					string path = Path.GetDirectoryName(textBox2.Text);
-					textBox2.Text  = Path.Combine(path ,end);
+					textBox2.Text = Path.Combine(path , end);
 
 				}
 			}
@@ -109,8 +118,26 @@ namespace hhm {
 			}
 		}
 
+		private string getOmegaFromBox() {
+			return textBox3.Text.Trim().Replace("\r" , "").Replace("\n" , "");
+		}
+
+
+
 		private void button6_Click( object sender , EventArgs e ) {
-			//TODO make me.
+			string validationText =textBox3.Text;
+			VitterbiResult vres = getViterbiPrediction(getFaFromFile());
+			var test = testOmegas(vres.omega, validationText);
+			if (  test == null) {
+				MessageBox.Show("EQUAL");
+			} else {
+				MessageBox.Show("NOT EQUAL , THEY DIFFER AT: " + test.firstIndex+","+test.secoundIndex);
+			}
+
+		}
+
+		private FA getFaFromFile() {
+			return FA.readFromFile(textBox4.Text);
 		}
 
 		private void openFileDialog2_FileOk( object sender , CancelEventArgs e ) {
@@ -120,5 +147,13 @@ namespace hhm {
 		private void saveFileDialog1_FileOk( object sender , CancelEventArgs e ) {
 
 		}
+	}
+	struct VitterbiResult {
+		public List<List<double>> omega;
+		public string prediction;
+	}
+	class indexInOmega {
+		public int firstIndex { get; set; }
+		public int secoundIndex { get; set; }
 	}
 }

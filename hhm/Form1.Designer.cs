@@ -171,7 +171,7 @@
 			// 
 			// button5
 			// 
-			this.button5.Location = new System.Drawing.Point(479, 230);
+			this.button5.Location = new System.Drawing.Point(479, 231);
 			this.button5.Name = "button5";
 			this.button5.Size = new System.Drawing.Size(129, 23);
 			this.button5.TabIndex = 12;
@@ -183,7 +183,7 @@
 			// 
 			this.button6.Location = new System.Drawing.Point(479, 192);
 			this.button6.Name = "button6";
-			this.button6.Size = new System.Drawing.Size(129, 23);
+			this.button6.Size = new System.Drawing.Size(129, 33);
 			this.button6.TabIndex = 13;
 			this.button6.Text = "Validate omega";
 			this.button6.UseVisualStyleBackColor = true;
