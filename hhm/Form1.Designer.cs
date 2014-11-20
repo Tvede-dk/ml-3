@@ -44,7 +44,7 @@
 			// 
 			// button1
 			// 
-			this.button1.Location = new System.Drawing.Point(12, 230);
+			this.button1.Location = new System.Drawing.Point(12, 234);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(245, 23);
 			this.button1.TabIndex = 0;
@@ -107,10 +107,11 @@
 			// 
 			// textBox3
 			// 
-			this.textBox3.Location = new System.Drawing.Point(12, 194);
+			this.textBox3.Location = new System.Drawing.Point(12, 195);
+			this.textBox3.MaxLength = 0;
 			this.textBox3.Multiline = true;
 			this.textBox3.Name = "textBox3";
-			this.textBox3.Size = new System.Drawing.Size(461, 20);
+			this.textBox3.Size = new System.Drawing.Size(461, 33);
 			this.textBox3.TabIndex = 6;
 			// 
 			// button2
