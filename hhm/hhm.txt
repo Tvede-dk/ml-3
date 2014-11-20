@@ -1,6 +1,7 @@
 ﻿states
 7
 1 2 3 4 5 6 7
+N N N C N N N
 observables
 4
 A C G T 

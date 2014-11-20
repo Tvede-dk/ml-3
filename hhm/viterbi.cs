@@ -151,5 +151,9 @@ namespace hhm {
 			}
 			return z;
 		}
+
+		public HHM getHHM() {
+			return hm;
+		}
 	}
 }
