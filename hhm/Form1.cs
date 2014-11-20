@@ -8,6 +8,10 @@ namespace hhm {
     public partial class Form1 : Form {
         public Form1() {
             InitializeComponent();
+			textBox1.Text = Directory.GetCurrentDirectory() + "/hhm.txt";
+			textBox4.Text = Directory.GetCurrentDirectory() + "/genome/genome7.fa";
+			textBox2.Text =  Directory.GetCurrentDirectory()+"/pred/temp.result";
+
         }
 
         private void button1_Click( object sender, EventArgs e ) {
