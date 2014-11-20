@@ -87,6 +87,22 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="annotation\annotation1.fa" />
+    <None Include="annotation\annotation2.fa" />
+    <None Include="annotation\annotation3.fa" />
+    <None Include="annotation\annotation4.fa" />
+    <None Include="annotation\annotation5.fa" />
+    <None Include="genome\genome1.fa" />
+    <None Include="genome\genome10.fa" />
+    <None Include="genome\genome2.fa" />
+    <None Include="genome\genome3.fa" />
+    <None Include="genome\genome4.fa" />
+    <None Include="genome\genome5.fa" />
+    <None Include="genome\genome6.fa" />
+    <None Include="genome\genome7.fa" />
+    <None Include="genome\genome8.fa" />
+    <None Include="genome\genome9.fa" />
+    <None Include="pred\README" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -109,6 +125,11 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>XCOPY "$(SolutionDir)pred" "$(TargetDir)\pred\" /S /Y
+XCOPY "$(SolutionDir)annotation" "$(TargetDir)\annotation\" /S /Y
+XCOPY "$(SolutionDir)genome" "$(TargetDir)\genome\" /S /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
