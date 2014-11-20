@@ -8,9 +8,13 @@ namespace hhm {
     public partial class Form1 : Form {
         public Form1() {
             InitializeComponent();
+			DirectoryInfo current = new DirectoryInfo(Directory.GetCurrentDirectory());
+			string dir = current.Parent.Parent.FullName;
 			textBox1.Text = Directory.GetCurrentDirectory() + "/hhm.txt";
-			textBox4.Text = Directory.GetCurrentDirectory() + "/genome/genome7.fa";
-			textBox2.Text =  Directory.GetCurrentDirectory()+"/pred/temp.result";
+
+			
+			textBox4.Text = dir+ "/genome/genome7.fa";
+			textBox2.Text =  dir+"/pred/temp.result";
 
         }
 
