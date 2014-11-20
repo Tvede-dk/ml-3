@@ -18,7 +18,7 @@ namespace hhm {
 
 		private void button1_Click( object sender , EventArgs e ) {
 			try {
-				var fa = getFaFromForm();
+				var fa = getFaFromFile();
 				VitterbiResult res = getViterbiPrediction(fa);
 				File.WriteAllText(textBox2.Text , fa.description + "\r\n" + res);
 				MessageBox.Show("sucess");
