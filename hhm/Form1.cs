@@ -156,8 +156,12 @@ namespace hhm {
 
 		}
 
-	}
-	struct VitterbiResult {
+        private void button7_Click( object sender, EventArgs e ) {
+            var count = new counting.Counting();
+            count.test();
+        }
+    }
+    struct VitterbiResult {
 		public List<List<double>> omega;
 		public string prediction;
 	}

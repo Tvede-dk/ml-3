@@ -64,6 +64,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="counting\Counting.cs" />
+    <Compile Include="counting\readAnnotations.cs" />
     <Compile Include="FA.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
