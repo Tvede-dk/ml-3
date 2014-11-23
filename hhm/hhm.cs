@@ -137,16 +137,16 @@ namespace hhm {
             #region init probs
             sb.Clear();
             for ( int i = 0; i < initProbes.Length; i++ ) {
-                sb.Append( initProbes[i] ).Append( " " );
+                sb.Append( initProbes[i].ToString( CultureInfo.InvariantCulture ) ).Append( " " );
             }
             result.Add( sb.ToString() );
             #endregion
             result.Add( "transProbs" );
-            
+
             for ( int i = 0; i < states; i++ ) {
                 sb.Clear();
                 for ( int j = 0; j < states; j++ ) {
-                    sb.Append( transProbs[i, j] ).Append( " " );
+                    sb.Append( transProbs[i, j].ToString( CultureInfo.InvariantCulture ) ).Append( " " );
                 }
                 result.Add( sb.ToString() );
             }
@@ -155,7 +155,7 @@ namespace hhm {
             for ( int i = 0; i < states; i++ ) {
                 sb.Clear();
                 for ( int j = 0; j < observables; j++ ) {
-                    sb.Append( emprobes[i, j] ).Append( " " );
+                    sb.Append( emprobes[i, j].ToString( CultureInfo.InvariantCulture ) ).Append( " " );
                 }
                 result.Add( sb.ToString() );
             }
@@ -163,5 +163,6 @@ namespace hhm {
 
             return result.ToArray();
         }
+
     }
 }
