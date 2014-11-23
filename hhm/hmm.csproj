@@ -104,6 +104,8 @@
     <None Include="genome\genome7.fa" />
     <None Include="genome\genome8.fa" />
     <None Include="genome\genome9.fa" />
+    <None Include="hmm\simple.tex" />
+    <None Include="hmm\startStopReverse.tex" />
     <None Include="pred\README" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -122,6 +124,8 @@
     <Content Include="hhm.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="hmm\simple.txt" />
+    <Content Include="hmm\startStopReverse.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

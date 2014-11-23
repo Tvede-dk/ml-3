@@ -6,7 +6,7 @@ using System.Text;
 
 
 namespace hhm {
-	public class HHM {
+	public class HMM {
 		public int states;
 		public List<int> statesList = new List<int>();
 
@@ -22,8 +22,8 @@ namespace hhm {
 
 		public double[,] emprobes = new double[0 , 0];
 
-		public static HHM readFromFile( string fileName ) {
-			HHM result = new HHM();
+		public static HMM readFromFile( string fileName ) {
+			HMM result = new HMM();
 
 			string[] lines = File.ReadAllLines(fileName);
 			int states = int.Parse(lines[1]);

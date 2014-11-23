@@ -8,7 +8,7 @@ namespace hhm.counting {
 
         public void test() {
             long states = 7;
-            var hm = new HHM();
+            var hm = new HMM();
             Dictionary<int, char> observalbes;
             countStruct[,] table = new countStruct[states, states];
             String annotated = "NNCCCCCCNN";
@@ -58,15 +58,15 @@ namespace hhm.counting {
                 //ERROR; INVALID MODEL.
             }
             List<char> resultingChar = new List<char>();
-            foreach (var item in result) {
+            //foreach (var item in result) {
 
-                var state = observalbes[item];
+            //    var state = observalbes[item];
 
-                if (resultingChar.Contains(value)) {// the char
-                }else {
-                    resultingChar.Add( value );//the char
-                }
-            }
+            //    if (resultingChar.Contains(value)) {// the char
+            //    }else {
+            //        resultingChar.Add( value );//the char
+            //    }
+            //}
             return result;
         }
 

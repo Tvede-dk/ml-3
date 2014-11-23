@@ -6,11 +6,11 @@ using System.Text;
 namespace hhm {
 	public class viterbi {
 		private String omegaObs;
-		private HHM hm;
+		private HMM hm;
 
 		private List<List<double>> calculatedOmega = new List<List<double>>();
 
-		public viterbi( HHM hm ) {
+		public viterbi( HMM hm ) {
 			this.hm = hm;
 		}
 
@@ -152,7 +152,7 @@ namespace hhm {
 			return z;
 		}
 
-		public HHM getHHM() {
+		public HMM getHHM() {
 			return hm;
 		}
 	}
