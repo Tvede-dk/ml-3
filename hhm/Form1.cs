@@ -18,11 +18,27 @@ namespace hhm {
         }
 
         private void button1_Click( object sender, EventArgs e ) {
+            HMM h = HMM.readFromFile( textBox1.Text );
+            useHmmForRun( h );
+            //try {
+            //    var fa = getFaFromFile();
+            //    var vit = getVitterbiDefault();
+            //    var res = getViterbiPrediction( fa, vit );
+            //    String result = vit.getHHM().convertUsingAnnotations( res.prediction );
+            //    File.WriteAllText( textBox2.Text, fa.description + "\r\n" + result );
+            //    MessageBox.Show( "sucess" );
+            //} catch ( Exception except ) {
+            //    MessageBox.Show( "Error:" + except.Message );
+            //}
+        }
+
+
+        private void useHmmForRun( HMM hmm ) {
             try {
                 var fa = getFaFromFile();
-                var vit = getVitterbiDefault();
+                var vit = new viterbi( hmm );
                 var res = getViterbiPrediction( fa, vit );
-                String result = vit.getHHM().convertUsingAnnotations( res.prediction );
+                String result = hmm.convertUsingAnnotations( res.prediction );
                 File.WriteAllText( textBox2.Text, fa.description + "\r\n" + result );
                 MessageBox.Show( "sucess" );
             } catch ( Exception except ) {
@@ -162,9 +178,17 @@ namespace hhm {
             //count.test();
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
-            var hmmCust= new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //simple.txt
+            var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
             hmmCust.getHmm();
 
+        }
+
+        private void button8_Click( object sender, EventArgs e ) {
+            DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
+            string dir = current.Parent.Parent.FullName;
+            var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
+            var hmm =  hmmCust.getHmm();
+            useHmmForRun( hmm );
         }
     }
     struct VitterbiResult {

@@ -41,7 +41,7 @@ namespace hhm.counting {
             parseHmmfile( File.ReadAllLines( hmmFile ) );
         }
 
-        public string getAllTextWithoutFirstLine( string file ) {
+        public static string getAllTextWithoutFirstLine( string file ) {
             String[] lines = File.ReadAllLines( file );
             StringBuilder sb = new StringBuilder();
             for ( int i = 1; i < lines.Length; i++ ) {
@@ -95,7 +95,7 @@ namespace hhm.counting {
         }
 
 
-        private formatValues parseVal( String s ) {
+        private static formatValues parseVal( String s ) {
             formatValues result = formatValues.zero;
             switch ( s ) {
                 case "0":
@@ -112,7 +112,7 @@ namespace hhm.counting {
         }
 
 
-        private string[] splitLine( string line, char split = ' ' ) {
+        private static string[] splitLine( string line, char split = ' ' ) {
             return line.Split( new char[] { split }, StringSplitOptions.RemoveEmptyEntries );
         }
 
@@ -129,27 +129,23 @@ namespace hhm.counting {
             int currentNode = startNode;
 
             for ( int i = 0; i < annotatedData.Length; i++ ) {
+                List<int> path;
                 if ( annotatedData[i] == 'N' ) {
-                    ////ASSERTION CURRENT NODE == START NODE (we should always end in the start node again, after a tour.).
-                    //if ( currentNode != startNode ) {
-                    //    throw new NotSupportedException( "ERROR DEBUG ME" );
-                    //}
-                    ////count the transition
-                    //hmmCalc.transProbs[startNode].add_J_To_K( startNode );
-                    ////count the char.
-                    //hmmCalc.emProbs[startNode].addCount( getIndexFromObs( geneData[i] ) );
-                    //continue;
-                    List<int> path = statesFromCurrentLocation( currentNode, i, 1, 1 ); //we have designed the model to work in a depth of 1. thats how the N's works
+                    path = statesFromCurrentLocationNoRec( currentNode, i, 0 ); //we have designed the model to work in a depth of 1. thats how the N's works
                     foreach ( var item in path ) {
                         //add to the transistions.
-                        hmmCalc.transProbs[currentNode].add_J_To_K( item ); ;
+                        hmmCalc.transProbs[currentNode].add_J_To_K( item );
                         //then the ems
                         hmmCalc.emProbs[item].addCount( getIndexFromObs( geneData[i] ) );
                         currentNode = item;//update currentNode to item
-                        i++;//we are going over the data. REMBEBER THIS!!!!!
+                        if ( item != 0 ) {
+                            throw new NotSupportedException( "ERROR DEBUG ME" );
+                        }
                     }
                 } else {//either R or C, but we do not care :P
-                    List<int> path = statesFromCurrentLocation( currentNode, i, 3, 3 ); //we have designed the model to work in a depth of 3.
+                    int end = annotatedData.IndexOf( 'N', i );
+                    int count = end - i;
+                    path = statesFromCurrentLocationNoRec( currentNode, i, count ); //we have designed the model to work in a depth of 3.
                     foreach ( var item in path ) {
                         //add to the transistions.
                         hmmCalc.transProbs[currentNode].add_J_To_K( item ); ;
@@ -158,41 +154,197 @@ namespace hhm.counting {
                         currentNode = item;//update currentNode to item
                         i++;//we are going over the data. REMBEBER THIS!!!!!
                     }
-
                 }
+
+
             }
 
-            //secound phase, convert the internal calulation into the HMM.
+            HMM result = new HMM();
+
+            //second phase, convert the internal calculation into the HMM.
+
+            //result.ObsAnnotation = obsAnn;
+            //result.emprobes = emProbes;
+            //result.initProbes = initpr.ToArray();
+            //result.states = states;
+            //result.statesList = stateslist;
+            //result.transProbs = transProbes;
+            //result.obsList = obsDict;
+            //result.observables = obsCount;
+
+            //plumming
+            result.states = states;
+            result.statesList = new List<int>();
+            for ( int i = 1; i < states + 1; i++ ) {
+                result.statesList.Add( i );
+            }
+            result.observables = obs.Count;//4
+            result.ObsAnnotation = statesAnnotations;
+
+            Console.WriteLine( "" );
+            Console.WriteLine( "--------------INIT PROBS--------------" );
+            Console.WriteLine( "" );
+            //assumtion:  there is only one start node. otherwise most of the code will need more work (actually).
+            result.initProbes = new double[initProbs.Count];
+            for ( int i = 0; i < initProbs.Count; i++ ) {
+                double val = 0;
+                if ( initProbs[i] == formatValues.one ) {
+                    val = 1;
+                }
+                Console.Write( val + " " );
+                result.initProbes[i] = val;
+            }
+            Console.WriteLine( "" );
+
+            //char to int. A C G T  = 0, 1,2,3
+            result.obsList = lookupObsToIndex;
 
 
-            return null;
-        }
 
-        private List<int> statesFromCurrentLocation( int currentNodeIndex, int indexInData, int depth, int startDepth ) {
-            List<int> result;
-            if ( depth <= 0 ) {
-                return getPossibleNodes( currentNodeIndex, indexInData );
-            } else {
-                int foundPossiblePath = 0;
-                result = new List<int>();
-                var nodes = getPossibleNodes( currentNodeIndex, indexInData );
-                int chosenPath = -1;
-                foreach ( var item in nodes ) {
-                    var temp = statesFromCurrentLocation( item, indexInData + 1, depth - 1, startDepth );
-                    if ( temp.Count > 0 ) {
-                        //possible.
-                        foundPossiblePath++;
-                        result = temp;
-                        chosenPath = item;
+            //transition probabilities
+            Console.WriteLine( "" );
+            Console.WriteLine( "--------------trans probs--------------" );
+            Console.WriteLine( "" );
+            result.transProbs = new double[states, states];
+            for ( int i = 0; i < transProbs.Count; i++ ) {
+                var lst = transProbs[i];
+                var calced = hmmCalc.transProbs[i].getTransProbs();
+                for ( int j = 0; j < lst.Count; j++ ) {
+                    switch ( lst[j] ) {
+                        case formatValues.one:
+                            //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
+                            if ( 1 != calced[j] && hmmCalc.transProbs[i].getRefs() != 0 ) {
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                            }
+                            Console.Write( 1 + " " );
+                            result.transProbs[i, j] = 1;
+                            break;
+                        case formatValues.x:
+                            Console.Write( calced[j] + " " );
+                            result.transProbs[i, j] = calced[j];
+                            break;
+                        case formatValues.zero:
+                            //validation:
+                            if ( 0 != calced[j] ) {
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                            }
+                            Console.Write( 0 + " " );
+                            result.transProbs[i, j] = 0;
+                            break;
                     }
                 }
-                if ( foundPossiblePath > 1 ) {
-                    throw new NotSupportedException( "ERROR DEBUG ME" );
+                Console.WriteLine( "" );
+            }
+
+            Console.WriteLine( "" );
+            Console.WriteLine( "--------------emprobes--------------" );
+            Console.WriteLine( "" );
+
+            result.emprobes = new double[states, obs.Count];
+            for ( int i = 0; i < emProbs.Count; i++ ) {
+                var lst = emProbs[i];
+                var calced = hmmCalc.emProbs[i].getRatios();
+                for ( int j = 0; j < lst.Count; j++ ) {
+                    switch ( lst[j] ) {
+                        case formatValues.one:
+                            //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
+                            if ( 1 != calced[j] && hmmCalc.emProbs[i].getRefs() != 0 ) {
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                            }
+                            Console.Write( 1 + " " );
+                            result.emprobes[i, j] = 1;
+                            break;
+                        case formatValues.x:
+                            Console.Write( calced[j] + " " );
+                            result.emprobes[i, j] = calced[j];
+                            break;
+                        case formatValues.zero:
+                            //validation:
+                            if ( 0 != calced[j] ) {
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                            }
+                            Console.Write( 0 + " " );
+                            result.emprobes[i, j] = 0;
+                            break;
+                    }
                 }
-                if ( chosenPath != -1 ) {
-                    result.Insert( 0, chosenPath );
-                }else {
-                    return new List<int>();//we got no path.
+                Console.WriteLine( "" );
+            }
+            return result;
+        }
+
+        //TODO remove once certian that the non recursive works....
+
+        //private List<int> statesFromCurrentLocation( int currentNodeIndex, int indexInData, int depth ) {
+        //    List<int> result;
+        //    if ( depth <= 0 ) {
+        //        return getPossibleNodes( currentNodeIndex, indexInData );
+        //    } else {
+        //        int foundPossiblePath = 0;
+        //        result = new List<int>();
+        //        var nodes = getPossibleNodes( currentNodeIndex, indexInData );
+        //        int chosenPath = -1;
+        //        foreach ( var item in nodes ) {
+        //            var temp = statesFromCurrentLocation( item, indexInData + 1, depth - 1 );
+        //            if ( temp.Count > 0 ) {
+        //                //possible.
+        //                foundPossiblePath++;
+        //                result = temp;
+        //                chosenPath = item;
+        //            }
+        //        }
+        //        if ( foundPossiblePath > 1 ) {
+        //            throw new NotSupportedException( "ERROR DEBUG ME" );
+        //        }
+        //        if ( chosenPath != -1 ) {
+        //            result.Insert( 0, chosenPath );
+        //        } else {
+        //            return new List<int>();//we got no path.
+        //        }
+        //    }
+        //    return result;
+        //}
+
+
+        private List<int> statesFromCurrentLocationNoRec( int currentNodeIndex, int indexInData, int depth ) {
+
+            var stack = new List<List<int>>();
+            var nodes = getPossibleNodes( currentNodeIndex, indexInData );
+            foreach ( var item in nodes ) {
+                var lst = new List<int>();
+                lst.Add( item );
+                stack.Add( lst );
+            }
+            List<int> result = new List<int>();
+            while ( stack.Count > 0 ) {
+
+                //pop an element
+                List<int> currentSteps = stack[stack.Count - 1];
+                stack.RemoveAt( stack.Count - 1 );
+
+                bool haveFoundPath =  (currentSteps.Count >= depth); ;
+                for ( int i = currentSteps.Count; i < depth + 1; i++ ) {
+
+
+                    int currentNode = currentSteps.Last();
+                    int currentIndex = indexInData + currentSteps.Count;
+                    var innerNodes = getPossibleNodes( currentNode, currentIndex );
+                    if ( innerNodes.Count == 0 ) {
+                        break;
+
+                    } else {
+                        for ( int nn = 1; nn < innerNodes.Count; nn++ ) {
+                            List<int> newPossiblePath = new List<int>( currentSteps );
+                            newPossiblePath.Add( innerNodes[nn] );
+                            stack.Add( newPossiblePath );
+                        }
+                        currentSteps.Add( innerNodes[0] );
+                    }
+                    haveFoundPath = (i == depth);
+                }
+                if ( haveFoundPath == true ) {
+                    result = currentSteps;
+                    break;
                 }
             }
             return result;
@@ -256,9 +408,17 @@ namespace hhm.counting {
         public List<double> getTransProbs() {
             var result = new List<double>();
             foreach ( var item in jToK ) {
-                result.Add( (double)item / (double)allRefs );
+                if ( allRefs == 0 ) {
+                    result.Add( 0 );
+                } else {
+                    result.Add( (double)item / (double)allRefs );
+                }
             }
             return result;
+        }
+
+        public int getRefs() {
+            return allRefs;
         }
     }
 
@@ -283,12 +443,18 @@ namespace hhm.counting {
         public List<double> getRatios() {
             var result = new List<double>();
             foreach ( var item in counts ) {
-                result.Add( (double)item / (double)totalCounts );
+                if ( totalCounts == 0 ) {
+                    result.Add( 0 );
+                } else {
+                    result.Add( (double)item / (double)totalCounts );
+                }
             }
             return result;
         }
 
-
+        public int getRefs() {
+            return totalCounts;
+        }
     }
 
     public class InternalHMM {
