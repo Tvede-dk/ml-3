@@ -94,6 +94,9 @@ namespace hhm {
                 for ( int i = 0; i < lastInserted.Count; i++ ) {
                     double maxInner = double.NegativeInfinity;
                     for ( int u = 0; u < lastInserted.Count; u++ ) {
+                        if ( lastInserted[u] == double.NegativeInfinity ) {
+                            continue;
+                        }
                         double d = lastInserted[u] + precomputedTransprobs[u, i];
                         maxInner = Math.Max( d, maxInner );
                     }
@@ -115,9 +118,8 @@ namespace hhm {
 
             StringBuilder sb = new StringBuilder();
             for ( int i = res.Count - 1; i >= 0; i-- ) {
-                string valOfInt = (res[i] + 1).ToString();
                 sb.Append( "," );
-                sb.Append( valOfInt );
+                sb.Append( res[i] + 1 );
             }
             return sb.ToString();
         }

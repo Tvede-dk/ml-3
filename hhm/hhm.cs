@@ -75,7 +75,6 @@ namespace hhm {
                     j++;
                 }
             }
-
             result.ObsAnnotation = obsAnn;
             result.emprobes = emProbes;
             result.initProbes = initpr.ToArray();
@@ -84,8 +83,6 @@ namespace hhm {
             result.transProbs = transProbes;
             result.obsList = obsDict;
             result.observables = obsCount;
-
-
             return result;
         }
 
@@ -94,25 +91,9 @@ namespace hhm {
             StringBuilder sb = new StringBuilder();
             foreach ( var item in split ) {
                 int index = int.Parse( item ) - 1;
-                //int index = (int)Char.GetNumericValue( item ) - 1;
-                string val = index + "";
-                int indexOfAnnotated = getIndexFromObsList( val );
-                //int indexOfAnnotated = obsList.Keys.ElementAt(index);
-                sb.Append( ObsAnnotation[indexOfAnnotated] );
+                sb.Append( ObsAnnotation[index] );
             }
             return sb.ToString();
         }
-
-        public int getIndexFromObsList( string look ) {
-            int i = 0;
-            foreach ( var item in obsList ) {
-                if ( item.Value == int.Parse( look ) ) {
-                    return i;
-                }
-                i++;
-            }
-            return 0;
-        }
-
     }
 }
