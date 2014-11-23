@@ -180,6 +180,7 @@ namespace hhm.counting {
             }
             result.observables = obs.Count;//4
             result.ObsAnnotation = statesAnnotations;
+            result.obserablesList = obs;
 
             Console.WriteLine( "" );
             Console.WriteLine( "--------------INIT PROBS--------------" );
@@ -272,38 +273,6 @@ namespace hhm.counting {
             }
             return result;
         }
-
-        //TODO remove once certian that the non recursive works....
-
-        //private List<int> statesFromCurrentLocation( int currentNodeIndex, int indexInData, int depth ) {
-        //    List<int> result;
-        //    if ( depth <= 0 ) {
-        //        return getPossibleNodes( currentNodeIndex, indexInData );
-        //    } else {
-        //        int foundPossiblePath = 0;
-        //        result = new List<int>();
-        //        var nodes = getPossibleNodes( currentNodeIndex, indexInData );
-        //        int chosenPath = -1;
-        //        foreach ( var item in nodes ) {
-        //            var temp = statesFromCurrentLocation( item, indexInData + 1, depth - 1 );
-        //            if ( temp.Count > 0 ) {
-        //                //possible.
-        //                foundPossiblePath++;
-        //                result = temp;
-        //                chosenPath = item;
-        //            }
-        //        }
-        //        if ( foundPossiblePath > 1 ) {
-        //            throw new NotSupportedException( "ERROR DEBUG ME" );
-        //        }
-        //        if ( chosenPath != -1 ) {
-        //            result.Insert( 0, chosenPath );
-        //        } else {
-        //            return new List<int>();//we got no path.
-        //        }
-        //    }
-        //    return result;
-        //}
 
 
         private List<int> statesFromCurrentLocationNoRec( int currentNodeIndex, int indexInData, int depth ) {

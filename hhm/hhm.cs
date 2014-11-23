@@ -13,6 +13,8 @@ namespace hhm {
         public int observables = 0;
         public Dictionary<char, int> obsList = new Dictionary<char, int>();
 
+        public List<char> obserablesList = new List<char>();
+
         public List<char> ObsAnnotation = new List<char>();
 
 
@@ -40,11 +42,12 @@ namespace hhm {
                 obsAnn.Add( split[i][0] );
             }
 
-
+            var obsListChar = new List<char>();
             var obsCount = int.Parse( lines[5] );
             var obsDict = new Dictionary<char, int>();
             split = lines[6].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
             for ( int i = 0; i < obsCount; i++ ) {
+                obsListChar.Add( split[i][0] );
                 obsDict.Add( split[i][0], i );
             }
             //init probes
@@ -83,6 +86,7 @@ namespace hhm {
             result.transProbs = transProbes;
             result.obsList = obsDict;
             result.observables = obsCount;
+            result.obserablesList = obsListChar;
             return result;
         }
 
@@ -94,6 +98,70 @@ namespace hhm {
                 sb.Append( ObsAnnotation[index] );
             }
             return sb.ToString();
+        }
+
+
+        public string[] saveToText() {
+            List<string> result = new List<string>();
+            StringBuilder sb = new StringBuilder();
+            result.Add( "states" );
+
+            #region states and annotations
+
+
+            result.Add( states + "" );
+
+            for ( int i = 1; i < states + 1; i++ ) {
+                sb.Append( i ).Append( " " );
+            }
+            result.Add( sb.ToString() );
+            sb.Clear();
+
+            for ( int i = 0; i < states; i++ ) {
+                sb.Append( ObsAnnotation[i] ).Append( " " );
+            }
+            result.Add( sb.ToString() );
+            sb.Clear();
+            #endregion
+            result.Add( "observables" );
+            #region obserables
+            result.Add( "" + observables );
+            sb.Clear();
+            for ( int i = 0; i < observables; i++ ) {
+                sb.Append( obserablesList[i] ).Append( " " );
+            }
+            result.Add( sb.ToString() );
+
+            #endregion
+            result.Add( "initProbs" );
+            #region init probs
+            sb.Clear();
+            for ( int i = 0; i < initProbes.Length; i++ ) {
+                sb.Append( initProbes[i] ).Append( " " );
+            }
+            result.Add( sb.ToString() );
+            #endregion
+            result.Add( "transProbs" );
+            
+            for ( int i = 0; i < states; i++ ) {
+                sb.Clear();
+                for ( int j = 0; j < states; j++ ) {
+                    sb.Append( transProbs[i, j] ).Append( " " );
+                }
+                result.Add( sb.ToString() );
+            }
+
+            result.Add( "emProbs" );
+            for ( int i = 0; i < states; i++ ) {
+                sb.Clear();
+                for ( int j = 0; j < observables; j++ ) {
+                    sb.Append( emprobes[i, j] ).Append( " " );
+                }
+                result.Add( sb.ToString() );
+            }
+
+
+            return result.ToArray();
         }
     }
 }

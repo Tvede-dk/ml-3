@@ -20,16 +20,6 @@ namespace hhm {
         private void button1_Click( object sender, EventArgs e ) {
             HMM h = HMM.readFromFile( textBox1.Text );
             useHmmForRun( h );
-            //try {
-            //    var fa = getFaFromFile();
-            //    var vit = getVitterbiDefault();
-            //    var res = getViterbiPrediction( fa, vit );
-            //    String result = vit.getHHM().convertUsingAnnotations( res.prediction );
-            //    File.WriteAllText( textBox2.Text, fa.description + "\r\n" + result );
-            //    MessageBox.Show( "sucess" );
-            //} catch ( Exception except ) {
-            //    MessageBox.Show( "Error:" + except.Message );
-            //}
         }
 
 
@@ -179,7 +169,12 @@ namespace hhm {
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
             var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
-            hmmCust.getHmm();
+            var hmm =  hmmCust.getHmm();
+            var res =  saveFileDialog1.ShowDialog();
+            if ( res == DialogResult.OK ) {
+                File.WriteAllLines( saveFileDialog1.FileName, hmm.saveToText() );
+            }
+
 
         }
 
