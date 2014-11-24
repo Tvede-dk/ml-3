@@ -18,10 +18,10 @@ for a in annotation:
   # Check that the files exists
   assert isfile(a)
 
-start = set()
-stop = set()
-revStart = set()
-revStop = set()
+start = dict()
+stop = dict()
+revStart = dict()
+revStop = dict()
 
 for i in xrange(len(genome)):
   # Read the file and skip the first "information" line
@@ -38,21 +38,21 @@ for i in xrange(len(genome)):
   for j in xrange(len(g)):
     if not coding and a[j] == 'C':
       codon = g[j] + g[j+1] + g[j+2]
-      start.add(codon)
+      start[codon] = start.get(codon, 0) + 1
       j = j + 2
       coding = True
     elif not coding and a[j] == 'R':
       codon = g[j] + g[j+1] + g[j+2]
-      revStart.add(codon)
+      revStart[codon] = revStart.get(codon, 0) + 1
       j = j + 2
       coding = True   
     elif coding and a[j] == 'N':
       codon = g[j-3] + g[j-2] + g[j-1]
       coding = False
       if a[j-1] == 'C':
-        stop.add(codon)
+        stop[codon] = stop.get(codon, 0) + 1
       else:
-        revStop.add(codon)
+        revStop[codon] = revStop.get(codon, 0) + 1
 
   # Ensure that all coding and non-coding are divisible by 3
   # And that they contains more than just stop and start
@@ -68,22 +68,22 @@ for i in xrange(len(genome)):
 print 'N -> C (START)'
 print '=============='
 for codon in start:
-  print codon
+  print codon, start[codon]
   
 print ""
 print 'C -> N (STOP)'
 print '============='
 for codon in stop:
-  print codon
+  print codon, stop[codon]
 
 print ''
 print 'N -> R (START)'
 print '=============='
 for codon in revStart:
-  print codon
+  print codon, revStart[codon]
   
 print ''
 print 'R -> N (STOP)'
 print '=============='
 for codon in revStop:
-  print codon
+  print codon, revStop[codon]
