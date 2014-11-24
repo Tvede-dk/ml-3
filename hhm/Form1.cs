@@ -168,7 +168,7 @@ namespace hhm {
             //count.test();
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
-            var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
+			var hmmCust = new readAnnotations(dir + "/genome/genome1.fa" , dir + "/annotation/annotation1.fa" , textBox1.Text); //startStopReverse.txt  simple.txt
             var hmm = hmmCust.getHmm();
             var res = saveFileDialog1.ShowDialog();
             if ( res == DialogResult.OK ) {
@@ -181,7 +181,7 @@ namespace hhm {
         private void button8_Click( object sender, EventArgs e ) {
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
-            var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
+			var hmmCust = new readAnnotations(dir + "/genome/genome1.fa" , dir + "/annotation/annotation1.fa" ,  textBox1.Text); //startStopReverse.txt  simple.txt
             var hmm = hmmCust.getHmm();
             useHmmForRun( hmm );
         }
@@ -198,7 +198,7 @@ namespace hhm {
                 geneFiles.Add( dir + "/genome/genome" + i + ".fa" );
                 annoFiles.Add( dir + "/annotation/annotation" + i + ".fa" );
             }
-            HMM best = readAnnotations.n_fold_cross_validation( geneFiles, annoFiles, dir + "/hmm/startStopReverse.txt" );
+			HMM best = readAnnotations.n_fold_cross_validation(geneFiles , annoFiles , textBox1.Text);
             string[] text = best.saveToText();
             var res = saveFileDialog1.ShowDialog();
             if ( res == DialogResult.OK ) {
