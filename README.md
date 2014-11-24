@@ -10,6 +10,6 @@ Build and execute on Linux
 ----------------
 
 1. Ensure that you have [mono installed](http://www.mono-project.com/download/#download-lin)
-2. Run `xbuild` in root directory
+2. Run `xbuild /tv:12.0` in root directory
 3. Change into directory `hhm/bin/[Debug]/`
 4. Run `mono hhm.exe`
