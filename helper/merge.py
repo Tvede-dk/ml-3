@@ -1,10 +1,22 @@
 import sys
+from os.path import isfile
+
+try:
+	# Check user input
+	assert len(sys.argv) == 3
+	assert isfile(sys.argv[1])
+	assert isfile(sys.argv[2])
+except AssertionError:
+	print 'Usage: python merge.py [C-only file] [R-only file]'
+	sys.exit(1)
 
 with open(sys.argv[1], 'rb') as cFile, open(sys.argv[2], 'rb') as rFile:
 	cAnn = cFile.readlines()
 	rAnn = rFile.readlines()
 	# Annotation came from the same file
-	assert cAnn[0] == rAnn[0]
+	if cAnn[0] != rAnn[0]:
+		print 'C-only and R-only file must origin from the same genome'
+		sys.exit(1)
 	firstLine = cAnn[0]
 	del cAnn[0]
 	del rAnn[0]
