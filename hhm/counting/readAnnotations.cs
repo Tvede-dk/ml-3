@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace hhm.counting {
     public class readAnnotations {
@@ -177,7 +176,7 @@ namespace hhm.counting {
                         case formatValues.one:
                             //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
                             if ( 1 != calced[j] && hmmCalc.transProbs[i].getRefs() != 0 ) {
-                                //throw new NotSupportedException( "ERROR DEBUG ME" );
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( 1 + " " );
                             result.transProbs[i, j] = 1;
@@ -189,7 +188,7 @@ namespace hhm.counting {
                         case formatValues.zero:
                             //validation:
                             if ( 0 != calced[j] ) {
-                                //throw new NotSupportedException( "ERROR DEBUG ME" );
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( 0 + " " );
                             result.transProbs[i, j] = 0;
@@ -212,7 +211,7 @@ namespace hhm.counting {
                         case formatValues.one:
                             //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
                             if ( 1 != calced[j] && hmmCalc.emProbs[i].getRefs() != 0 ) {
-                               // throw new NotSupportedException( "ERROR DEBUG ME" );
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( calced[j] + " " );
                             result.emprobes[i, j] = calced[j];
@@ -224,7 +223,7 @@ namespace hhm.counting {
                         case formatValues.zero:
                             //validation:
                             if ( 0 != calced[j] ) {
-                                //throw new NotSupportedException( "ERROR DEBUG ME" );
+                                throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( calced[j] + " " );
                             result.emprobes[i, j] = calced[j];
@@ -277,7 +276,7 @@ namespace hhm.counting {
                     path = statesFromCurrentLocationNoRec( currentNode, i, count ); //we have designed the model to work in a depth of 3.
                     foreach ( var item in path ) {
                         //add to the transistions.
-                        if ( item == currentNode) {
+                        if ( item == currentNode ) {
                             throw new NotSupportedException( "ERROR DEBUG ME" );
                         }
                         hmmCalc.transProbs[currentNode].add_J_To_K( item ); //from currentNode to item.
@@ -301,7 +300,8 @@ namespace hhm.counting {
             //List<InternalHMM> preCalced = new List<InternalHMM>(); //parallel this.
             var preCalced = new InternalHMM[files.Count];
             readAnnotations sampleReader = null;
-            Parallel.For( 0, files.Count, ( int i ) => {
+            //Parallel.For( 0, files.Count, ( int i ) => {
+            for ( int i = 0; i < files.Count; i++ ) {
                 var data = files[i];
                 var anno = annotatedFiles[i];
                 var reader = new readAnnotations( data, anno, hmmFile );
@@ -309,11 +309,7 @@ namespace hhm.counting {
                 sampleReader = reader;
                 obs = reader.obs.Count;
                 preCalced[i] = reader.performCalculations();
-
-
-
-                
-            } );
+            }// );
             for ( int i = 0; i < files.Count; i++ ) {
                 var data = files[i];
                 var anno = annotatedFiles[i];
@@ -330,14 +326,12 @@ namespace hhm.counting {
             var precission = new double[preCalced.Length];
             var calculated = new HMM[preCalced.Length];
 
-            Parallel.For( 0, preCalced.Length, ( int i ) => {
-
-
-                //for ( int i = 0; i < preCalced.Length; i++ ) {
+            //Parallel.For( 0, preCalced.Length, ( int i ) => {
+            for ( int i = 0; i < preCalced.Length; i++ ) {
                 InternalHMM current = new InternalHMM( states, obs );
                 for ( int j = 0; j < preCalced.Length; j++ ) {
                     if ( i != j ) {
-                       current.append( preCalced[j] );
+                        current.append( preCalced[j] );
                     }
                 }
                 var testFileData = files[i];
@@ -358,7 +352,7 @@ namespace hhm.counting {
                 }
 
                 //}
-            } );
+            }// );
 
             var bestIndex = 0;
             var bestVal = 0d;
@@ -558,7 +552,7 @@ namespace hhm.counting {
                     result.Add( (double)item / (double)totalCounts );
                 }
             }
-           // result.Reverse();
+            // result.Reverse();
             return result;
         }
 
