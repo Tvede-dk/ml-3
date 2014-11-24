@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace hhm.counting {
     public class readAnnotations {
@@ -119,46 +120,7 @@ namespace hhm.counting {
 
         #endregion
 
-
-        //the worker function.. wee.
-        public HMM getHmm() {
-
-            InternalHMM hmmCalc = new InternalHMM( states, obs.Count );
-            int startNode = getStartState();
-
-            int currentNode = startNode;
-
-            for ( int i = 0; i < annotatedData.Length; i++ ) {
-                List<int> path;
-                if ( annotatedData[i] == 'N' ) {
-                    path = statesFromCurrentLocationNoRec( currentNode, i, 0 ); //we have designed the model to work in a depth of 1. thats how the N's works
-                    foreach ( var item in path ) {
-                        //add to the transistions.
-                        hmmCalc.transProbs[currentNode].add_J_To_K( item );
-                        //then the ems
-                        hmmCalc.emProbs[item].addCount( getIndexFromObs( geneData[i] ) );
-                        currentNode = item;//update currentNode to item
-                        if ( item != 0 ) {
-                            throw new NotSupportedException( "ERROR DEBUG ME" );
-                        }
-                    }
-                } else {//either R or C, but we do not care :P
-                    int end = annotatedData.IndexOf( 'N', i );
-                    int count = end - i;
-                    path = statesFromCurrentLocationNoRec( currentNode, i, count ); //we have designed the model to work in a depth of 3.
-                    foreach ( var item in path ) {
-                        //add to the transistions.
-                        hmmCalc.transProbs[currentNode].add_J_To_K( item ); ;
-                        //then the ems
-                        hmmCalc.emProbs[item].addCount( getIndexFromObs( geneData[i] ) );
-                        currentNode = item;//update currentNode to item
-                        i++;//we are going over the data. REMBEBER THIS!!!!!
-                    }
-                }
-
-
-            }
-
+        public HMM getHmm( InternalHMM hmmCalc ) {
             HMM result = new HMM();
 
             //second phase, convert the internal calculation into the HMM.
@@ -215,7 +177,7 @@ namespace hhm.counting {
                         case formatValues.one:
                             //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
                             if ( 1 != calced[j] && hmmCalc.transProbs[i].getRefs() != 0 ) {
-                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                                //throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( 1 + " " );
                             result.transProbs[i, j] = 1;
@@ -227,7 +189,7 @@ namespace hhm.counting {
                         case formatValues.zero:
                             //validation:
                             if ( 0 != calced[j] ) {
-                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                                //throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
                             Console.Write( 0 + " " );
                             result.transProbs[i, j] = 0;
@@ -250,10 +212,10 @@ namespace hhm.counting {
                         case formatValues.one:
                             //if we have not taken the path, then, although it is a legit path, it might not even exits in this data set.
                             if ( 1 != calced[j] && hmmCalc.emProbs[i].getRefs() != 0 ) {
-                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                               // throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
-                            Console.Write( 1 + " " );
-                            result.emprobes[i, j] = 1;
+                            Console.Write( calced[j] + " " );
+                            result.emprobes[i, j] = calced[j];
                             break;
                         case formatValues.x:
                             Console.Write( calced[j] + " " );
@@ -262,16 +224,185 @@ namespace hhm.counting {
                         case formatValues.zero:
                             //validation:
                             if ( 0 != calced[j] ) {
-                                throw new NotSupportedException( "ERROR DEBUG ME" );
+                                //throw new NotSupportedException( "ERROR DEBUG ME" );
                             }
-                            Console.Write( 0 + " " );
-                            result.emprobes[i, j] = 0;
+                            Console.Write( calced[j] + " " );
+                            result.emprobes[i, j] = calced[j];
                             break;
                     }
                 }
                 Console.WriteLine( "" );
             }
             return result;
+        }
+
+        //the worker function.. wee.
+        public HMM getHmm() {
+            InternalHMM hmmCalc = performCalculations();
+            return getHmm( hmmCalc );
+
+        }
+
+        public InternalHMM performCalculations() {
+            InternalHMM hmmCalc = new InternalHMM( states, obs.Count );
+            calcUsingIHHM( hmmCalc );
+            return hmmCalc;
+        }
+        /// <summary>
+        /// causes sideeffects to the supplied hmmcalc.
+        /// </summary>
+        /// <param name="hmmCalc"></param>
+        public void calcUsingIHHM( InternalHMM hmmCalc ) {
+            int startNode = getStartState();
+
+            int currentNode = startNode;
+
+            for ( int i = 0; i < annotatedData.Length; i++ ) {
+                List<int> path;
+                if ( annotatedData[i] == 'N' ) {
+                    path = statesFromCurrentLocationNoRec( currentNode, i, 0 ); //we have designed the model to work in a depth of 1. thats how the N's works
+                    foreach ( var item in path ) {
+                        //add to the transistions.
+                        hmmCalc.transProbs[currentNode].add_J_To_K( item );
+                        //then the ems
+                        hmmCalc.emProbs[item].addCount( getIndexFromObs( geneData[i] ) );
+                        currentNode = item;//update currentNode to item
+                        if ( item != 0 ) {
+                            throw new NotSupportedException( "ERROR DEBUG ME" );
+                        }
+                    }
+                } else {//either R or C, but we do not care :P
+                    int end = annotatedData.IndexOf( 'N', i );
+                    int count = end - i;
+                    path = statesFromCurrentLocationNoRec( currentNode, i, count ); //we have designed the model to work in a depth of 3.
+                    foreach ( var item in path ) {
+                        //add to the transistions.
+                        if ( item == currentNode) {
+                            throw new NotSupportedException( "ERROR DEBUG ME" );
+                        }
+                        hmmCalc.transProbs[currentNode].add_J_To_K( item ); //from currentNode to item.
+                        //then the ems
+                        hmmCalc.emProbs[item].addCount( getIndexFromObs( geneData[i] ) ); // update items emission probo
+                        currentNode = item;
+                        //currentNode = item;//update currentNode to item
+                        i++;//we are going over the data. REMBEBER THIS!!!!!
+                    }
+                }
+
+
+            }
+        }
+
+
+        public static HMM n_fold_cross_validation( List<string> files, List<string> annotatedFiles, string hmmFile ) {
+
+            int states = 0;
+            int obs = 0;
+            //List<InternalHMM> preCalced = new List<InternalHMM>(); //parallel this.
+            var preCalced = new InternalHMM[files.Count];
+            readAnnotations sampleReader = null;
+            Parallel.For( 0, files.Count, ( int i ) => {
+                var data = files[i];
+                var anno = annotatedFiles[i];
+                var reader = new readAnnotations( data, anno, hmmFile );
+                states = reader.states;
+                sampleReader = reader;
+                obs = reader.obs.Count;
+                preCalced[i] = reader.performCalculations();
+
+
+
+                
+            } );
+            for ( int i = 0; i < files.Count; i++ ) {
+                var data = files[i];
+                var anno = annotatedFiles[i];
+                var reader = new readAnnotations( data, anno, hmmFile );
+                states = reader.states;
+                sampleReader = reader;
+                obs = reader.obs.Count;
+                preCalced[i] = reader.performCalculations();
+            }
+            //prepare for multi-threading.
+            //var precission = new List<double>();
+            //var calculated = new List<HMM>();
+
+            var precission = new double[preCalced.Length];
+            var calculated = new HMM[preCalced.Length];
+
+            Parallel.For( 0, preCalced.Length, ( int i ) => {
+
+
+                //for ( int i = 0; i < preCalced.Length; i++ ) {
+                InternalHMM current = new InternalHMM( states, obs );
+                for ( int j = 0; j < preCalced.Length; j++ ) {
+                    if ( i != j ) {
+                       current.append( preCalced[j] );
+                    }
+                }
+                var testFileData = files[i];
+                var testFileAnnotation = annotatedFiles[i];
+                var hmm = sampleReader.getHmm( current );
+                viterbi vi = new viterbi( hmm );
+                string data = getAllTextWithoutFirstLine( testFileData );
+                vi.setOmega( data );
+                vi.getOmegaMulti();
+                string anno = hmm.convertUsingAnnotations( vi.backtrack() );
+                string real = getAllTextWithoutFirstLine( testFileAnnotation );
+                //compare the anno and the real annotations.
+                if ( real.Length != anno.Length ) {
+                    throw new FormatException();
+                } else {
+                    precission[i] = getAcc( anno, real );
+                    calculated[i] = hmm;
+                }
+
+                //}
+            } );
+
+            var bestIndex = 0;
+            var bestVal = 0d;
+            //find best.
+            for ( int i = 0; i < precission.Length; i++ ) {
+                if ( precission[i] > bestVal ) {
+                    bestVal = precission[i];
+                    bestIndex = i;
+                }
+            }
+            return calculated[bestIndex];
+            //5 files.
+            //
+
+        }
+
+        private static double getAcc( string pred, string real ) {
+            double tp = 0, fp = 0, tn = 0, fn = 0;
+            for ( int i = 0; i < pred.Length; i++ ) {
+                if ( pred[i] == 'C' || pred[i] == 'R' ) {
+                    if ( pred[i] == real[i] ) {
+                        //if( real[i] == 'C' || real[i]== 'R' ) { 
+                        tp++;
+                    } else {
+                        fp++;
+                    }
+                } else {
+                    if ( real[i] == 'N' ) {
+                        tn++;
+                    } else {
+                        fn++;
+                    }
+                }
+            }
+            double sn = (tp) / (tp + fn);
+            double sp = (tp) / (tp + fp);
+            double cc = ((tp * tn - fp * fn)) / Math.Sqrt( ((tp + fn) * (tn + fp) * (tp + fp) * (tn + fn)) );
+            double acp = 0.25d * ((tp) / (tp + fn) + (tp) / (tp + fp) + (tn) / (tn + fp) + (tn) / (tn + fn));
+
+            double ac = (acp - 0.5d) * 2d;
+
+            string res = string.Format( "Sn = {0:0.0000}, Sp = {1:0.0000}, CC = {2:0.0000}, AC = {3:0.0000}", sn, sp, cc, ac );
+            Console.WriteLine( res );
+            return ac;
         }
 
 
@@ -290,8 +421,10 @@ namespace hhm.counting {
                 //pop an element
                 List<int> currentSteps = stack[stack.Count - 1];
                 stack.RemoveAt( stack.Count - 1 );
+                //List<int> currentSteps = stack[0];
+                //stack.RemoveAt( 0 );
 
-                bool haveFoundPath =  (currentSteps.Count >= depth); ;
+                bool haveFoundPath = (currentSteps.Count >= depth); ;
                 for ( int i = currentSteps.Count; i < depth + 1; i++ ) {
 
 
@@ -389,6 +522,13 @@ namespace hhm.counting {
         public int getRefs() {
             return allRefs;
         }
+
+        public void addArr( InternalTransProbCalc internalTransProbCalc ) {
+            allRefs += internalTransProbCalc.allRefs;
+            for ( int i = 0; i < internalTransProbCalc.jToK.Length; i++ ) {
+                jToK[i] += internalTransProbCalc.jToK[i];
+            }
+        }
     }
 
     public struct EmProbcalculation {
@@ -418,11 +558,19 @@ namespace hhm.counting {
                     result.Add( (double)item / (double)totalCounts );
                 }
             }
+           // result.Reverse();
             return result;
         }
 
         public int getRefs() {
             return totalCounts;
+        }
+
+        public void addArr( EmProbcalculation emProbcalculation ) {
+            this.totalCounts += emProbcalculation.totalCounts;
+            for ( int i = 0; i < emProbcalculation.counts.Length; i++ ) {
+                this.counts[i] += emProbcalculation.counts[i];
+            }
         }
     }
 
@@ -441,6 +589,19 @@ namespace hhm.counting {
             emProbs = new EmProbcalculation[states];
             for ( int i = 0; i < states; i++ ) {
                 emProbs[i] = new EmProbcalculation( obserables );
+            }
+
+        }
+
+        public void append( InternalHMM another ) {
+            //add values.
+
+            for ( int i = 0; i < another.emProbs.Length; i++ ) {
+                emProbs[i].addArr( another.emProbs[i] );
+            }
+
+            for ( int i = 0; i < another.transProbs.Length; i++ ) {
+                transProbs[i].addArr( another.transProbs[i] );
             }
 
         }

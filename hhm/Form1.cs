@@ -169,8 +169,8 @@ namespace hhm {
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
             var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
-            var hmm =  hmmCust.getHmm();
-            var res =  saveFileDialog1.ShowDialog();
+            var hmm = hmmCust.getHmm();
+            var res = saveFileDialog1.ShowDialog();
             if ( res == DialogResult.OK ) {
                 File.WriteAllLines( saveFileDialog1.FileName, hmm.saveToText() );
             }
@@ -182,8 +182,28 @@ namespace hhm {
             DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
             string dir = current.Parent.Parent.FullName;
             var hmmCust = new readAnnotations( dir + "/genome/genome1.fa", dir + "/annotation/annotation1.fa", dir + "/hmm/startStopReverse.txt" ); //startStopReverse.txt  simple.txt
-            var hmm =  hmmCust.getHmm();
+            var hmm = hmmCust.getHmm();
             useHmmForRun( hmm );
+        }
+
+        private void button9_Click( object sender, EventArgs e ) {
+            //principle.
+            List<string> geneFiles = new List<string>();
+            List<string> annoFiles = new List<string>();
+
+            DirectoryInfo current = new DirectoryInfo( Directory.GetCurrentDirectory() );
+            string dir = current.Parent.Parent.FullName;
+
+            for ( int i = 1; i < 6; i++ ) {
+                geneFiles.Add( dir + "/genome/genome" + i + ".fa" );
+                annoFiles.Add( dir + "/annotation/annotation" + i + ".fa" );
+            }
+            HMM best = readAnnotations.n_fold_cross_validation( geneFiles, annoFiles, dir + "/hmm/startStopReverse.txt" );
+            string[] text = best.saveToText();
+            var res = saveFileDialog1.ShowDialog();
+            if ( res == DialogResult.OK ) {
+                File.WriteAllLines( saveFileDialog1.FileName, text );
+            }
         }
     }
     struct VitterbiResult {
